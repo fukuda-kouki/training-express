@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from "express";
-import { getIdAndName,createPlayer, getDataById } from "../services/player-service";
-import { dbPool, transactionHelper } from "../helpers/db-helper";
+import { getIdAndName, createPlayer, getDataById } from "../services/player-service";
+import { dbPool } from "../helpers/db-helper";
 import { Player } from "../interfaces/player";
 import { NotFoundError } from "../interfaces/my-error";
 
