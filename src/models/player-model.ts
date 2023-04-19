@@ -1,7 +1,6 @@
 import { PoolConnection } from "mysql2/promise";
 import { Player } from "../interfaces/player";
 import { RowDataPacket,OkPacket } from "mysql2";
-import { error } from "console";
 import { NotFoundError } from "../interfaces/my-error";
 
 const selectPlayersIdAndName = async (dbConnection: PoolConnection): Promise<Player[]> => {
