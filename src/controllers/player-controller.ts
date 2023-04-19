@@ -11,14 +11,9 @@ export class PlayerController {
   ): Promise<void> {
     const dbConnection = await dbPool.getConnection();
     try {
-      await dbConnection.beginTransaction();
       const playerIdAndName = await getIdAndName(dbConnection);
-
-      await dbConnection.commit();
-      res.status(200);
-      res.json(playerIdAndName);
+      res.status(200).json(playerIdAndName);
     } catch (e) {
-      await dbConnection.rollback();
       next(e);
     } finally {
       dbConnection.release();
@@ -52,13 +47,12 @@ export class PlayerController {
     //変換したPlayerをserviceに渡す
     const dbConnection = await dbPool.getConnection();
     try {
-      let playerId: number;
-      await transactionHelper(dbConnection, async () => {
-        playerId = await createPlayer(playerData, dbConnection);
-      });
+      const playerId = await getIdAndName(dbConnection);
       res.status(200).json({ id: playerId! });
     } catch (e) {
       next(e);
+    } finally {
+      dbConnection.release();
     }
   }
 
