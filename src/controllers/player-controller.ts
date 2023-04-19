@@ -2,6 +2,7 @@ import { Response, Request, NextFunction } from "express";
 import { getIdAndName,createPlayer } from "../services/player-service";
 import { dbPool, transactionHelper } from "../helpers/db-helper";
 import { Player } from "../interfaces/player";
+import { create } from "domain";
 
 export class PlayerController {
   async getPlayersIdAndName(
@@ -47,7 +48,7 @@ export class PlayerController {
     //変換したPlayerをserviceに渡す
     const dbConnection = await dbPool.getConnection();
     try {
-      const playerId = await getIdAndName(dbConnection);
+      const playerId = await createPlayer(playerData, dbConnection);
       res.status(200).json({ id: playerId! });
     } catch (e) {
       next(e);
