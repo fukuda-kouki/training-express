@@ -25,4 +25,4 @@ const createPlayer = async (
   return createdId;
 };
 
-export { getIdAndName,getDataById , createPlayer };
+export { getIdAndName, getDataById, createPlayer };

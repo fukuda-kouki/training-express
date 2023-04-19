@@ -55,4 +55,4 @@ const insertPlayer = async (
   return rows.insertId;
 };
 
-export { selectPlayersIdAndName,selectPlayerDataById ,insertPlayer };
+export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer };
