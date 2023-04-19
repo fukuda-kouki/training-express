@@ -2,9 +2,19 @@ import * as playerModel from "../models/player-model";
 import { Player } from "../interfaces/player";
 import { PoolConnection } from "mysql2/promise";
 
-const getIdAndName = async (dbConnection: PoolConnection): Promise<Player[]> => {
+const getIdAndName = async (
+  dbConnection: PoolConnection
+): Promise<Player[]> => {
   const idAndName = await playerModel.selectPlayersIdAndName(dbConnection);
   return idAndName;
+};
+
+const getDataById = async (
+  id: number,
+  dbConnection: PoolConnection
+): Promise<Player> => {
+  const data = await playerModel.selectPlayerDataById(id, dbConnection);
+  return data;
 };
 
 const createPlayer = async (
@@ -15,4 +25,4 @@ const createPlayer = async (
   return createdId;
 };
 
-export { getIdAndName,createPlayer };
+export { getIdAndName,getDataById , createPlayer };

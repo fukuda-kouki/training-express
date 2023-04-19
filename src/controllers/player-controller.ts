@@ -1,7 +1,8 @@
 import { Response, Request, NextFunction } from "express";
-import { getIdAndName,createPlayer } from "../services/player-service";
+import { getIdAndName,createPlayer, getDataById } from "../services/player-service";
 import { dbPool, transactionHelper } from "../helpers/db-helper";
 import { Player } from "../interfaces/player";
+import { NotFoundError } from "../interfaces/my-error";
 
 export class PlayerController {
   async getPlayersIdAndName(
@@ -14,6 +15,26 @@ export class PlayerController {
       const playerIdAndName = await getIdAndName(dbConnection);
       res.status(200).json(playerIdAndName);
     } catch (e) {
+      next(e);
+    } finally {
+      dbConnection.release();
+    }
+  }
+
+  async getPlayerDataById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const playerId = parseInt(req.params.id);
+    const dbConnection = await dbPool.getConnection();
+    try {
+      const playerData = await getDataById(playerId,dbConnection);
+      res.status(200).json(playerData);
+    } catch (e) {
+      if(e instanceof  NotFoundError) {
+        res.status(400).json({message:`${e.name}:${e.message}`});
+      }
       next(e);
     } finally {
       dbConnection.release();

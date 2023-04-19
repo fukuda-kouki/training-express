@@ -7,4 +7,6 @@ const playerController = new PlayerController();
 //    /players
 
 router.get("/", playerController.getPlayersIdAndName);
+router.get("/:id", playerController.getPlayerDataById);
+
 router.post("/", playerController.createPlayer);
