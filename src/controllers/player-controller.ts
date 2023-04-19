@@ -2,7 +2,6 @@ import { Response, Request, NextFunction } from "express";
 import { getIdAndName,createPlayer } from "../services/player-service";
 import { dbPool, transactionHelper } from "../helpers/db-helper";
 import { Player } from "../interfaces/player";
-import { create } from "domain";
 
 export class PlayerController {
   async getPlayersIdAndName(
