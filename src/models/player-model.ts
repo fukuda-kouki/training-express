@@ -86,4 +86,15 @@ const updatePlayer = async (
   );
 };
 
-export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer, updatePlayer };
+const deletePlayer = async (
+  id: number,
+  dbConnection: PoolConnection
+): Promise<void> => {
+  const sql = "DELETE FROM `players` WHERE id = ?";
+  await dbConnection.query(
+    sql,
+    id
+  );
+};
+
+export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer, updatePlayer, deletePlayer };

@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from "express";
-import { getIdAndName, getDataById, createPlayer, updatePlayer  } from "../services/player-service";
+import { getIdAndName, getDataById, createPlayer, updatePlayer, destroyPlayer  } from "../services/player-service";
 import { dbPool } from "../helpers/db-helper";
 import { Player, PlayerKey, PlayerKeyString } from "../interfaces/player";
 import { NotFoundError } from "../interfaces/my-error";
@@ -26,10 +26,10 @@ export class PlayerController {
     res: Response,
     next: NextFunction
   ): Promise<void> {
-    const playerId = parseInt(req.params.id);
+    const requestId = parseInt(req.params.id);
     const dbConnection = await dbPool.getConnection();
     try {
-      const playerData = await getDataById(playerId,dbConnection);
+      const playerData = await getDataById(requestId,dbConnection);
       res.status(200).json(playerData);
     } catch (e) {
       if(e instanceof  NotFoundError) {
@@ -68,8 +68,8 @@ export class PlayerController {
     //変換したPlayerをserviceに渡す
     const dbConnection = await dbPool.getConnection();
     try {
-      const playerId = await createPlayer(playerData, dbConnection);
-      res.status(200).json({ id: playerId! });
+      const requestId = await createPlayer(playerData, dbConnection);
+      res.status(200).json({ id: requestId! });
     } catch (e) {
       next(e);
     } finally {
@@ -95,6 +95,26 @@ export class PlayerController {
     const dbConnection = await dbPool.getConnection();
     try {
       await updatePlayer(requestData, dbConnection);
+      res.status(200).json({message:"completed"});
+    } catch (e) {
+      if(e instanceof  NotFoundError) {
+        res.status(400).json({message:`${e.name}:${e.message}`});
+      }
+      next(e);
+    } finally {
+      dbConnection.release();
+    }
+  }
+
+  async destroyPlayer(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    const requestId = parseInt(req.params.id);
+    const dbConnection = await dbPool.getConnection();
+    try {
+      await destroyPlayer(requestId, dbConnection);
       res.status(200).json({message:"completed"});
     } catch (e) {
       if(e instanceof  NotFoundError) {
