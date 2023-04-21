@@ -32,4 +32,11 @@ const updatePlayer = async (
   await playerModel.updatePlayer(data, dbConnection);
 };
 
-export { getIdAndName, getDataById, createPlayer, updatePlayer };
+const destroyPlayer = async (
+  id: number,
+  dbConnection: PoolConnection
+): Promise<void> => {
+  await playerModel.deletePlayer(id, dbConnection);
+};
+
+export { getIdAndName, getDataById, createPlayer, updatePlayer, destroyPlayer };
