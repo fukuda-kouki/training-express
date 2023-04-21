@@ -6,9 +6,8 @@ const playerController = new PlayerController();
 
 //    /players
 
-router.get("/"   , playerController.getPlayersIdAndName);
-router.get("/:id", playerController.getPlayerDataById);
-
-router.post("/"  , playerController.createPlayer);
-
-router.put("/:id", playerController.updatePlayer);
+router.get   ("/"   , playerController.getPlayersIdAndName);
+router.get   ("/:id", playerController.getPlayerDataById);
+router.post  ("/"   , playerController.createPlayer);
+router.put   ("/:id", playerController.updatePlayer);
+router.delete("/:id", playerController.destroyPlayer);
