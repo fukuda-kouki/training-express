@@ -10,3 +10,5 @@ router.get("/"   , playerController.getPlayersIdAndName);
 router.get("/:id", playerController.getPlayerDataById);
 
 router.post("/"  , playerController.createPlayer);
+
+router.put("/:id", playerController.updatePlayer);

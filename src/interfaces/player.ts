@@ -5,5 +5,6 @@ interface Player {
     mp?: number;
     money?: number;
   }
-
-  export { Player };
+  type PlayerKey = keyof Player;
+  const PlayerKeyString = ["id","name","hp","mp","money"];
+  export { Player, PlayerKey, PlayerKeyString };

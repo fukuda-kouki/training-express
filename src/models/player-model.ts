@@ -1,5 +1,5 @@
 import { PoolConnection } from "mysql2/promise";
-import { Player } from "../interfaces/player";
+import { Player, PlayerKey } from "../interfaces/player";
 import { RowDataPacket, OkPacket } from "mysql2";
 import { NotFoundError } from "../interfaces/my-error";
 
@@ -55,4 +55,35 @@ const insertPlayer = async (
   return rows.insertId;
 };
 
-export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer };
+const updatePlayer = async (
+  data: Player,
+  dbConnection: PoolConnection
+): Promise<void> => {
+
+  //idがないならエラー
+  if(data.id == null) throw new NotFoundError("id is undefined.");
+
+  //Playerからカラム名と値を別の配列にして取得
+  let columnName: string[] = [];
+  let updatingData: (string | number)[] = [];
+  (Object.keys(data) as PlayerKey[]).forEach((key) => {
+    if(key == "id") return; //idはWHERE句で使いたいため配列には格納しない
+    const tempData = data[key]; //そのままだとなぜかundefinedを型除外できないため代入
+    if(key != null && tempData != null) {
+      columnName.push(`${key} = ?`);
+      updatingData.push(tempData);
+    }
+  });
+
+  //配列の最後にWHERE句に使うidを入れる
+  updatingData.push(data.id);
+
+  //UPDATE
+  const sql = "UPDATE `players` SET " + columnName.join(", ") + " WHERE id = ?";
+  await dbConnection.query(
+    sql,
+    updatingData
+  );
+};
+
+export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer, updatePlayer };
