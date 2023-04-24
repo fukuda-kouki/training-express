@@ -18,4 +18,4 @@ router.get("/errorSample" , hogeController.errorResponse);
 router.use("/foo"         , foo.router);
 router.use("/users"       , users.router);
 router.use("/players"     , players.router);
-router.use("/players/:id/", player_items.router);
+router.use("/players"     , player_items.router);
