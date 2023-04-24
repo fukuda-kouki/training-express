@@ -2,6 +2,7 @@ import * as express from "express";
 import * as foo from "./foo";
 import * as users from "./users";
 import * as players from "./players";
+import * as player_items from "./player-items";
 
 import { HogeController } from "../controllers";
 
@@ -13,7 +14,8 @@ router.get("/", (req, res, next) => {
   res.status(200);
   res.json({ text: "Hello World" });
 });
-router.get("/errorSample", hogeController.errorResponse);
-router.use("/foo", foo.router);
-router.use("/users", users.router);
-router.use("/players", players.router);
+router.get("/errorSample" , hogeController.errorResponse);
+router.use("/foo"         , foo.router);
+router.use("/users"       , users.router);
+router.use("/players"     , players.router);
+router.use("/players"     , player_items.router);
