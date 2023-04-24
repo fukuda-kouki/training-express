@@ -1,6 +1,6 @@
 interface PlayerItems {
-    player_id?: number,
-    item_id?: number,
+    playerId?: number,
+    itemId?: number,
     count?: number
 }
 

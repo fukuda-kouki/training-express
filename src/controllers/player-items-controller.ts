@@ -12,8 +12,8 @@ export class PlayerItemsController {
   ): Promise<void> {
 
     const requestData: PlayerItems = {
-      player_id: parseInt(req.params.id),
-      item_id: req.body.itemId,
+      playerId: parseInt(req.params.id),
+      itemId: req.body.itemId,
       count: req.body.count
     }
 
@@ -24,7 +24,7 @@ export class PlayerItemsController {
       await transactionHelper(dbConnection, async () => {
         itemCount = await addItem(requestData, dbConnection);
       });
-      res.status(200).json({id: requestData.item_id, count: itemCount});
+      res.status(200).json({id: requestData.itemId, count: itemCount});
     } catch (e) {
       if(e instanceof  NotFoundError) {
         res.status(400).json({message:`${e.name}:${e.message}`});
