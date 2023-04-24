@@ -29,7 +29,7 @@ const selectPlayerDataById = async (
   );
 
   let playerData: Player;
-  if(rows[0] == null) throw new NotFoundError(`Data not found. id:${id}`); //データが存在しない場合
+  if(rows[0] == null) throw new NotFoundError(`Playerdata not found. id:${id}`); //データが存在しない場合
 
   //DBから取得したデータをPlayerに変換
   playerData = {
@@ -97,20 +97,4 @@ const deletePlayer = async (
   );
 };
 
-//プレイヤーデータの存在チェック
-const checkPlayerExist = async (
-  id:number,
-  dbConnection: PoolConnection
-  ):Promise<boolean> => {
-
-  const sql = "SELECT `id` FROM `players` WHERE `id` = ? FOR UPDATE"
-  const [playerRows] = await dbConnection.query<RowDataPacket[]>(
-    sql,
-    id
-  );
-
-  if(playerRows[0] != null) return true;
-  else return false;
-}
-
-export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer, updatePlayer, deletePlayer, checkPlayerExist };
+export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer, updatePlayer, deletePlayer };
