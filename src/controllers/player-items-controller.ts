@@ -20,7 +20,6 @@ export class PlayerItemsController {
     const dbConnection = await dbPool.getConnection();
     try {
       let itemCount: number = 0;
-      // トランザクション例2
       await transactionHelper(dbConnection, async () => {
         itemCount = await addItem(requestData, dbConnection);
       });
