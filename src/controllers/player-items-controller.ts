@@ -1,8 +1,9 @@
 import { Response, Request, NextFunction } from "express";
 import { PlayerItems } from "../interfaces/player-items";
 import { dbPool, transactionHelper } from "../helpers/db-helper";
-import { addItem, useItem } from "../services/player-items-service";
+import { addItem, useGacha, useItem } from "../services/player-items-service";
 import { MyError } from "../interfaces/my-error";
+import { Gahca } from "../interfaces/gacha";
 
 export class PlayerItemsController {
   async addItem(
@@ -54,6 +55,32 @@ export class PlayerItemsController {
         playerDataWithUsingItems = await useItem(requestData, dbConnection);
       });
       res.status(200).json({playerDataWithUsingItems});
+    } catch (e) {
+      if(e instanceof MyError) {
+        res.status(400).json({message:`${e.name}:${e.message}`});
+      }
+      next(e);
+    }
+  }
+
+  async useGacha(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+
+    let requestData: Gahca = {
+      playerId: parseInt(req.params.id),
+      count: req.body.count
+    }
+
+    const dbConnection = await dbPool.getConnection();
+    try {
+      let gachaResult: {} = {};
+      await transactionHelper(dbConnection, async () => {
+        gachaResult = await useGacha(requestData, dbConnection);
+      });
+      res.status(200).json({gachaResult});
     } catch (e) {
       if(e instanceof MyError) {
         res.status(400).json({message:`${e.name}:${e.message}`});

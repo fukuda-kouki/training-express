@@ -26,12 +26,35 @@ const selectPlayerItemsDataById = async (
   return playerItemData;
 }
 
+//player_idからレコードをすべて選択してデータを取得
+const selectPlayerItemsByPlayerId = async (
+  id: number,
+  dbConnection: PoolConnection
+): Promise<PlayerItems[]> => {
+  const sql = "SELECT * FROM `player_items` WHERE `player_id` = ?";
+  const [rows] = await dbConnection.query<RowDataPacket[]>(
+    sql,
+    id
+  );
+
+  if(rows[0] == null) throw new NotFoundError(`PlayerItemdata not found. playerId:${id} itemId:${id}`); //データが存在しない場合
+
+  const playerItemData = rows.map((row) => {
+    return {
+      playerId: row.player_id,
+      itemId:   row.item_id,
+      count:    row.count
+    }
+  });
+
+  return playerItemData;
+}
+
 //データをinsertし、主キーが重複するデータがある場合にupdateする
 const insertOrIncrementData = async (
   data: PlayerItems,
   dbConnection: PoolConnection
 ): Promise<void> => {
-
   const sql = "INSERT INTO `player_items`(`player_id`, `item_id`, `count`) VALUES (?, ?, ? ) ON DUPLICATE KEY UPDATE `count` = `count` + ?";
   await dbConnection.query(
     sql,
@@ -64,4 +87,4 @@ const getCount =async (
     return rows[0].count;
 }
 
-export { selectPlayerItemsDataById, insertOrIncrementData, decrementData, getCount };
+export { selectPlayerItemsDataById, selectPlayerItemsByPlayerId, insertOrIncrementData, decrementData, getCount };
