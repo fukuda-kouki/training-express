@@ -164,7 +164,7 @@ const useGacha =async (
 
   //戻り値の成型
   let gachaResultObj: Array<{[index:string]: number}> = [];
-  Object.entries(gachaResult).forEach(async ([key, value]) => {
+  Object.entries(gachaResult).forEach(([key, value]) => {
     let tempObj: {[index:string]: number} = {};
     tempObj['itemId'] = parseInt(key);
     tempObj['count'] = value;
@@ -173,7 +173,7 @@ const useGacha =async (
 
   const playerItemsData = await selectPlayerItemsByPlayerId(gachaRequest.playerId,dbConnection);
   let resultItemsObj: Array<{[index:string]: number}> = [];
-  Object.entries(playerItemsData).forEach(async ([key, value]) => {
+  Object.entries(playerItemsData).forEach(([key, value]) => {
     if(value.itemId == null) throw new UndefinedError("value.itemId is undefined.");
     if(value.count  == null) throw new UndefinedError("value.count is undefined.");
     let tempObj: {[index:string]: number} = {};
