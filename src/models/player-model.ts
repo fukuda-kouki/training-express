@@ -24,15 +24,35 @@ const selectPlayerDataById = async (
   dbConnection: PoolConnection
 ): Promise<Player> => {
   const [rows] = await dbConnection.query<RowDataPacket[]>(
-    "SELECT * FROM `players` WHERE id = ?;",
+    "SELECT * FROM `players` WHERE id = ?",
     id
   );
-
-  let playerData: Player;
   if(rows[0] == null) throw new NotFoundError(`Playerdata not found. id:${id}`); //データが存在しない場合
 
   //DBから取得したデータをPlayerに変換
-  playerData = {
+  const playerData = {
+    id: rows[0].id,
+    name: rows[0].name,
+    hp: rows[0].hp,
+    mp: rows[0].mp,
+    money: rows[0].money
+  };
+
+  return playerData;
+} 
+
+const selectPlayerDataByIdWithLock = async (
+  id: number,
+  dbConnection: PoolConnection
+): Promise<Player> => {
+  const [rows] = await dbConnection.query<RowDataPacket[]>(
+    "SELECT * FROM `players` WHERE id = ? FOR UPDATE",
+    id
+  );
+  if(rows[0] == null) throw new NotFoundError(`Playerdata not found. id:${id}`); //データが存在しない場合
+
+  //DBから取得したデータをPlayerに変換
+  const playerData = {
     id: rows[0].id,
     name: rows[0].name,
     hp: rows[0].hp,
@@ -97,4 +117,4 @@ const deletePlayer = async (
   );
 };
 
-export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer, updatePlayer, deletePlayer };
+export { selectPlayersIdAndName, selectPlayerDataById, selectPlayerDataByIdWithLock, insertPlayer, updatePlayer, deletePlayer };
