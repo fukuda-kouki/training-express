@@ -24,15 +24,35 @@ const selectPlayerDataById = async (
   dbConnection: PoolConnection
 ): Promise<Player> => {
   const [rows] = await dbConnection.query<RowDataPacket[]>(
-    "SELECT * FROM `players` WHERE id = ?;",
+    "SELECT * FROM `players` WHERE id = ?",
     id
   );
-
-  let playerData: Player;
-  if(rows[0] == null) throw new NotFoundError(`Data not found. id:${id}`); //データが存在しない場合
+  if(rows[0] == null) throw new NotFoundError(`Playerdata not found. id:${id}`); //データが存在しない場合
 
   //DBから取得したデータをPlayerに変換
-  playerData = {
+  const playerData = {
+    id: rows[0].id,
+    name: rows[0].name,
+    hp: rows[0].hp,
+    mp: rows[0].mp,
+    money: rows[0].money
+  };
+
+  return playerData;
+}
+
+const selectPlayerDataByIdWithLock = async (
+  id: number,
+  dbConnection: PoolConnection
+): Promise<Player> => {
+  const [rows] = await dbConnection.query<RowDataPacket[]>(
+    "SELECT * FROM `players` WHERE id = ? FOR UPDATE",
+    id
+  );
+  if(rows[0] == null) throw new NotFoundError(`Playerdata not found. id:${id}`); //データが存在しない場合
+
+  //DBから取得したデータをPlayerに変換
+  const playerData = {
     id: rows[0].id,
     name: rows[0].name,
     hp: rows[0].hp,
@@ -97,20 +117,4 @@ const deletePlayer = async (
   );
 };
 
-//プレイヤーデータの存在チェック
-const checkPlayerExist = async (
-  id:number,
-  dbConnection: PoolConnection
-  ):Promise<boolean> => {
-
-  const sql = "SELECT `id` FROM `players` WHERE `id` = ? FOR UPDATE"
-  const [playerRows] = await dbConnection.query<RowDataPacket[]>(
-    sql,
-    id
-  );
-
-  if(playerRows[0] != null) return true;
-  else return false;
-}
-
-export { selectPlayersIdAndName, selectPlayerDataById, insertPlayer, updatePlayer, deletePlayer, checkPlayerExist };
+export { selectPlayersIdAndName, selectPlayerDataById, selectPlayerDataByIdWithLock, insertPlayer, updatePlayer, deletePlayer };

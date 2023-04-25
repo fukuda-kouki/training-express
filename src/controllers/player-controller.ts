@@ -2,7 +2,7 @@ import { Response, Request, NextFunction } from "express";
 import { getIdAndName, getDataById, createPlayer, updatePlayer, destroyPlayer  } from "../services/player-service";
 import { dbPool } from "../helpers/db-helper";
 import { Player, PlayerKey, PlayerKeyString } from "../interfaces/player";
-import { NotFoundError } from "../interfaces/my-error";
+import { MyError } from "../interfaces/my-error";
 
 export class PlayerController {
   async getPlayersIdAndName(
@@ -32,7 +32,7 @@ export class PlayerController {
       const playerData = await getDataById(requestId,dbConnection);
       res.status(200).json(playerData);
     } catch (e) {
-      if(e instanceof  NotFoundError) {
+      if(e instanceof MyError) {
         res.status(400).json({message:`${e.name}:${e.message}`});
       }
       next(e);
@@ -97,7 +97,7 @@ export class PlayerController {
       await updatePlayer(requestData, dbConnection);
       res.status(200).json({message:"completed"});
     } catch (e) {
-      if(e instanceof  NotFoundError) {
+      if(e instanceof MyError) {
         res.status(400).json({message:`${e.name}:${e.message}`});
       }
       next(e);
@@ -117,7 +117,7 @@ export class PlayerController {
       await destroyPlayer(requestId, dbConnection);
       res.status(200).json({message:"completed"});
     } catch (e) {
-      if(e instanceof  NotFoundError) {
+      if(e instanceof MyError) {
         res.status(400).json({message:`${e.name}:${e.message}`});
       }
       next(e);
