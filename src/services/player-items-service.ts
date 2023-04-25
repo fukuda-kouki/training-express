@@ -153,14 +153,14 @@ const useGacha =async (
   await updatePlayer(updatingData,dbConnection);
 
   //ガチャ結果を反映
-  Object.entries(gachaResult).forEach(async ([key, value]) => {
-    const updatingPlayerItemsData: PlayerItems = {
+  await Promise.all(Object.keys(gachaResult).map(async (key) => {
+    const tempplayerItemsData: PlayerItems = {
       playerId: gachaRequest.playerId,
-      itemId:   parseInt(key),
-      count:    gachaResult[parseInt(key)]
-    }
-    await insertOrIncrementData(updatingPlayerItemsData, dbConnection);
-  });
+      itemId: parseInt(key),
+      count: gachaResult[parseInt(key)]
+    };
+    await insertOrIncrementData(tempplayerItemsData, dbConnection);
+  }));
 
   //戻り値の成型
   let gachaResultObj: Array<{[index:string]: number}> = [];

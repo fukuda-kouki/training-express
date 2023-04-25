@@ -31,7 +31,6 @@ const selectPlayerItemsByPlayerId = async (
   id: number,
   dbConnection: PoolConnection
 ): Promise<PlayerItems[]> => {
-
   const sql = "SELECT * FROM `player_items` WHERE `player_id` = ?";
   const [rows] = await dbConnection.query<RowDataPacket[]>(
     sql,
@@ -56,7 +55,6 @@ const insertOrIncrementData = async (
   data: PlayerItems,
   dbConnection: PoolConnection
 ): Promise<void> => {
-
   const sql = "INSERT INTO `player_items`(`player_id`, `item_id`, `count`) VALUES (?, ?, ? ) ON DUPLICATE KEY UPDATE `count` = `count` + ?";
   await dbConnection.query(
     sql,
