@@ -13,6 +13,7 @@ class LimitExceededError extends MyError {}
 class UndefinedError extends MyError {}
 
 export {
+  MyError,
   DBError,
   NotFoundError,
   AuthError,
