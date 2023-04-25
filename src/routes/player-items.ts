@@ -4,6 +4,7 @@ export const router = express.Router();
 
 const playerItemsController = new PlayerItemsController();
 
-// /players/:id
-router.post("/:id/addItem", playerItemsController.addItem);
-router.post("/:id/useItem", playerItemsController.useItem);
+// /players
+router.post("/:id/addItem",  playerItemsController.addItem);
+router.post("/:id/useItem",  playerItemsController.useItem);
+router.post("/:id/useGacha", playerItemsController.useGacha);

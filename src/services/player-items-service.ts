@@ -1,14 +1,17 @@
 import { PoolConnection } from "mysql2/promise";
 import { PlayerItems } from "../interfaces/player-items";
-import { selectPlayerDataByIdWithLock } from "../models/player-model";
-import { selectItemDataById } from "../models/item-model";
-import { decrementData, getCount, insertOrIncrementData, selectPlayerItemsDataById } from "../models/player-items-model";
-import { updatePlayer } from "./player-service";
+import { selectPlayerDataByIdWithLock, updatePlayer } from "../models/player-model";
+import { selectAllItems, selectItemDataById } from "../models/item-model";
+import { decrementData, getCount, insertOrIncrementData,selectPlayerItemsDataById, selectPlayerItemsByPlayerId } from "../models/player-items-model";
 import { Player } from "../interfaces/player";
 import { NotEnoughError, UndefinedError } from "../interfaces/my-error";
+import { GACHA } from "../interfaces/gacha";
 
 //定数宣言
 const MAX_STATUS = 200;
+const GACHA_PRICE = 10;
+const MAX_RANDOM = 100;
+const MIN_RANDOM = 1;
 
 const addItem = async (
   addData: PlayerItems,
@@ -105,4 +108,88 @@ const useItem =async (
   return retval;
 }
 
-export{ addItem, useItem };
+const useGacha =async (
+  gachaRequest:GACHA,
+  dbConnection: PoolConnection
+  ):Promise<object> => {
+
+  //プレイヤーデータ取得&存在チェック&ロック
+  const playerData = await selectPlayerDataByIdWithLock(gachaRequest.playerId,dbConnection);
+  if(playerData.money == null) throw new UndefinedError("playerData.money is undefined.");
+
+  //プレイヤーが回数分のmoneyを所持しているか
+  if(playerData.money < gachaRequest.count * GACHA_PRICE) throw new NotEnoughError("playerData.money less than all gacha price.");
+
+  //アイテムデータ取得&存在チェック
+  const itemsData = await selectAllItems(dbConnection);
+
+  //ガチャを引く
+  let gachaResult: {[index: number] : number} = {};
+  for(let gachaCount = 0; gachaCount < gachaRequest.count; gachaCount++)
+  {
+    let resultId:number = 0; //ガチャの結果をitemIdで格納
+    let percent:number  = 0; //乱数をitemIdに変換する際に使用
+
+    //乱数生成 1~100の値をとる
+    const random = Math.floor(Math.random() * (MAX_RANDOM - MIN_RANDOM) + MIN_RANDOM);
+
+    //乱数をガチャの結果に変換
+    while(random > percent && resultId <= itemsData.length)
+    {
+      resultId++;
+      const tempItemData = itemsData[resultId - 1];
+      if(tempItemData.percent == null) throw new UndefinedError("itemsData[].price is undefined.");
+      percent += tempItemData.percent;
+    }
+    if(gachaResult[resultId] === undefined) gachaResult[resultId] = 1;
+    else gachaResult[resultId]++;
+  }
+
+  //代金を引く
+  const updatingData: Player =  {
+    id: gachaRequest.playerId,
+    money: playerData.money - gachaRequest.count * GACHA_PRICE
+  };
+  await updatePlayer(updatingData,dbConnection);
+
+  //ガチャ結果を反映
+  Object.entries(gachaResult).forEach(async ([key, value]) => {
+    const updatingPlayerItemsData: PlayerItems = {
+      playerId: gachaRequest.playerId,
+      itemId:   parseInt(key),
+      count:    gachaResult[parseInt(key)]
+    }
+    await insertOrIncrementData(updatingPlayerItemsData, dbConnection);
+  });
+
+  //戻り値の成型
+  let gachaResultObj: Array<{[index:string]: number}> = [];
+  Object.entries(gachaResult).forEach(async ([key, value]) => {
+    let tempObj: {[index:string]: number} = {};
+    tempObj['itemId'] = parseInt(key);
+    tempObj['count'] = value;
+    gachaResultObj.push(tempObj);
+  });
+
+  const playerItemsData = await selectPlayerItemsByPlayerId(gachaRequest.playerId,dbConnection);
+  let resultItemsObj: Array<{[index:string]: number}> = [];
+  Object.entries(playerItemsData).forEach(async ([key, value]) => {
+    if(value.itemId == null) throw new UndefinedError("value.itemId is undefined.");
+    if(value.count  == null) throw new UndefinedError("value.count is undefined.");
+    let tempObj: {[index:string]: number} = {};
+    tempObj['itemId'] = value.itemId;
+    tempObj['count'] = value.count;
+    resultItemsObj.push(tempObj);
+  });
+
+  const retval = {
+    'results': gachaResultObj,
+    'player' : {
+      'monay' : updatingData.money,
+      'items' : resultItemsObj
+    }
+  };
+  return retval;
+}
+
+export{ addItem, useItem, useGacha };
