@@ -1,9 +1,33 @@
 import { PoolConnection } from "mysql2/promise";
 import { PlayerItems } from "../interfaces/player-items";
 import { RowDataPacket } from "mysql2";
+import { NotFoundError } from "../interfaces/my-error";
+
+//主キーからレコードを選択してデータを取得
+const selectPlayerItemsDataById = async (
+  data: PlayerItems,
+  dbConnection: PoolConnection
+): Promise<PlayerItems> => {
+
+  const sql = "SELECT * FROM `player_items` WHERE `player_id` = ? AND `item_id` = ?";
+  const [rows] = await dbConnection.query<RowDataPacket[]>(
+    sql,
+    [data.playerId, data.itemId]
+  );
+
+  if(rows[0] == null) throw new NotFoundError(`PlayerItemdata not found. playerId:${data.playerId} itemId:${data.itemId}`); //データが存在しない場合
+
+  const playerItemData = {
+    playerId: rows[0].player_id,
+    itemId: rows[0].item_id,
+    count: rows[0].count
+  };
+
+  return playerItemData;
+}
 
 //データをinsertし、主キーが重複するデータがある場合にupdateする
-const insertOrUpdateData = async (
+const insertOrIncrementData = async (
   data: PlayerItems,
   dbConnection: PoolConnection
 ): Promise<void> => {
@@ -12,6 +36,17 @@ const insertOrUpdateData = async (
   await dbConnection.query(
     sql,
     [data.playerId, data.itemId, data.count, data.count]
+  );
+}
+
+const decrementData =async (
+  data:PlayerItems,
+  dbConnection: PoolConnection
+  ): Promise<void> => {
+  const sql = "UPDATE `player_items` SET `count` = `count` - ? WHERE player_id = ? AND item_id = ?";
+  await dbConnection.query(
+    sql,
+    [data.count, data.playerId, data.itemId]
   );
 }
 
@@ -29,4 +64,4 @@ const getCount =async (
     return rows[0].count;
 }
 
-export { insertOrUpdateData, getCount };
+export { selectPlayerItemsDataById, insertOrIncrementData, decrementData, getCount };

@@ -39,7 +39,7 @@ const selectPlayerDataById = async (
   };
 
   return playerData;
-} 
+}
 
 const selectPlayerDataByIdWithLock = async (
   id: number,
