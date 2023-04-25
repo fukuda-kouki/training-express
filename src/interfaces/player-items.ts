@@ -4,4 +4,5 @@ interface PlayerItems {
     count?: number
 }
 
-export {PlayerItems};
+type PlayerItemsKey = keyof PlayerItems;
+export {PlayerItems, PlayerItemsKey};
