@@ -5,7 +5,7 @@ import { selectAllItems, selectItemDataById } from "../models/item-model";
 import { decrementData, getCount, insertOrIncrementData,selectPlayerItemsDataById, selectPlayerItemsByPlayerId } from "../models/player-items-model";
 import { Player } from "../interfaces/player";
 import { NotEnoughError, UndefinedError } from "../interfaces/my-error";
-import { GACHA } from "../interfaces/gacha";
+import { Gahca } from "../interfaces/gacha";
 
 //定数宣言
 const MAX_STATUS = 200;
@@ -109,7 +109,7 @@ const useItem =async (
 }
 
 const useGacha =async (
-  gachaRequest:GACHA,
+  gachaRequest:Gahca,
   dbConnection: PoolConnection
   ):Promise<object> => {
 

@@ -3,7 +3,7 @@ import { PlayerItems } from "../interfaces/player-items";
 import { dbPool, transactionHelper } from "../helpers/db-helper";
 import { addItem, useGacha, useItem } from "../services/player-items-service";
 import { MyError } from "../interfaces/my-error";
-import { GACHA } from "../interfaces/gacha";
+import { Gahca } from "../interfaces/gacha";
 
 export class PlayerItemsController {
   async addItem(
@@ -69,7 +69,7 @@ export class PlayerItemsController {
     next: NextFunction
   ): Promise<void> {
 
-    let requestData: GACHA = {
+    let requestData: Gahca = {
       playerId: parseInt(req.params.id),
       count: req.body.count
     }
