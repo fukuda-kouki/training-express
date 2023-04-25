@@ -3,6 +3,28 @@ import { RowDataPacket } from "mysql2";
 import { Item } from "../interfaces/item";
 import { NotFoundError } from "../interfaces/my-error";
 
+//全アイテムデータ取得
+const selectAllItems = async(
+  dbConnection:PoolConnection
+):Promise<Item[]> => {
+  const sql = "SELECT * FROM `items`"
+  const [itemRows] = await dbConnection.query<RowDataPacket[]>(
+    sql
+  );
+
+  //データをItemに変換して返す
+  const itemData: Item[] = itemRows.map((row) => {
+    return {
+      id:      row.id,
+      name:    row.name,
+      heal:    row.heal,
+      price:   row.price,
+      percent: row.percent
+    };
+  });
+  return itemData;
+}
+
 //アイテムデータ取得
 const selectItemDataById = async(
   id:number,
@@ -27,4 +49,4 @@ const selectItemDataById = async(
   return itemData;
 }
 
-export { selectItemDataById };
+export { selectAllItems, selectItemDataById };
