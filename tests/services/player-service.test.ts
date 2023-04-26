@@ -29,7 +29,7 @@ test("getIdAndName関数", async () => {
   expect(await getIdAndName(conn)).toEqual(mock_id_and_name_all_players_empty);
 });
 
-
+const playerId = 1;
 const mock_player: Player = {
   id: 1,
   name: "user1",
@@ -44,7 +44,7 @@ test("getDataById関数", async () => {
     .mockResolvedValueOnce(mock_player)
 
   let conn: any;
-  expect(await getDataById(1,conn)).toEqual(mock_player);
+  expect(await getDataById(playerId,conn)).toEqual(mock_player);
 });
 
 
