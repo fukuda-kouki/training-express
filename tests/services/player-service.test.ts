@@ -2,35 +2,35 @@ import { getIdAndName, getDataById, createPlayer, updatePlayer, destroyPlayer } 
 import { Player } from "../../src/interfaces/player";
 import * as playerModel from "../../src/models/player-model";
 
-const mock_id_and_name_player_1: Player = {
+const mockPlayerIdAndName1: Player = {
   id: 1,
   name: "user1",
 };
 
-const mock_id_and_name_player_2: Player = {
+const mockPlayerIdAndName2: Player = {
   id: 2,
   name: "user2",
 };
 
-const mock_id_and_name_all_players: Player[] = [mock_id_and_name_player_1, mock_id_and_name_player_2 ];
-const mock_id_and_name_all_players_empty: Player[] = [];
+const mockAllPlayersIdAndName: Player[] = [mockPlayerIdAndName1, mockPlayerIdAndName2 ];
+const mockAllPlayersIdAndNameEmpty: Player[] = [];
 
 test("getIdAndName関数", async () => {
-  // selectPlayersIdAndNameを実行した時に、一回目はmock_data_all_playersを、
-  // 二回目はmock_data_all_players_emptyを返すようにする
+  // selectPlayersIdAndNameを実行した時に、一回目はmockAllPlayersIdAndNameを、
+  // 二回目はmockAllPlayersIdAndNameEmptyを返すようにする
   jest
     .spyOn(playerModel, "selectPlayersIdAndName")
-    .mockResolvedValueOnce(mock_id_and_name_all_players)
-    .mockResolvedValueOnce(mock_id_and_name_all_players_empty);
+    .mockResolvedValueOnce(mockAllPlayersIdAndName)
+    .mockResolvedValueOnce(mockAllPlayersIdAndNameEmpty);
 
   // 関数の実行結果と.toEqualの中身を比較する
   let conn: any;
-  expect(await getIdAndName(conn)).toEqual(mock_id_and_name_all_players);
-  expect(await getIdAndName(conn)).toEqual(mock_id_and_name_all_players_empty);
+  expect(await getIdAndName(conn)).toEqual(mockAllPlayersIdAndName);
+  expect(await getIdAndName(conn)).toEqual(mockAllPlayersIdAndNameEmpty);
 });
 
 const playerId = 1;
-const mock_player: Player = {
+const mockPlayer: Player = {
   id: 1,
   name: "user1",
   hp: 10,
@@ -41,15 +41,15 @@ const mock_player: Player = {
 test("getDataById関数", async () => {
   jest
     .spyOn(playerModel, "selectPlayerDataById")
-    .mockResolvedValueOnce(mock_player)
+    .mockResolvedValueOnce(mockPlayer)
 
   let conn: any;
-  expect(await getDataById(playerId,conn)).toEqual(mock_player);
+  expect(await getDataById(playerId,conn)).toEqual(mockPlayer);
 });
 
 
 const insertId = 1;
-const mock_insert_player: Player = {
+const mockInsertPlayer: Player = {
   name: "user1",
   hp: 10,
   mp: 10,
@@ -62,11 +62,11 @@ test("createPlayer関数",async () => {
     .mockResolvedValueOnce(insertId)
 
   let conn: any;
-  expect(await createPlayer(mock_insert_player,conn)).toBe(insertId);
+  expect(await createPlayer(mockInsertPlayer,conn)).toBe(insertId);
 })
 
 
-const mock_update_player_1: Player = {
+const mockUpdatePlayer: Player = {
   id: 1,
   name: "user1",
   hp: 10,
@@ -80,7 +80,7 @@ test("updatePlayer関数",async () => {
     .mockResolvedValue();
 
   let conn: any;
-  expect(await updatePlayer(mock_update_player_1,conn));
+  expect(await updatePlayer(mockUpdatePlayer,conn));
 })
 
 

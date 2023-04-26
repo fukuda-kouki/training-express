@@ -1,6 +1,6 @@
-import { getAllUsers, createUser } from "../src/services/user-service";
-import { User } from "../src/interfaces/user";
-import * as userModel from "../src/models/user-model";
+import { getAllUsers, createUser } from "../../src/services/user-service";
+import { User } from "../../src/interfaces/user";
+import * as userModel from "../../src/models/user-model";
 
 const mock_data_user_1: User = {
   id: 1,
