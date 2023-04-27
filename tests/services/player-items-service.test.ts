@@ -93,7 +93,6 @@ describe('player-items-service:useItem', () => {
     mp: playerData.mp
   };
 
-  if(itemData.id == null) return;
   const retval = {
     'itemId': itemData.id,
     'count':  playerItemsData.count! - useItemData.count!,
