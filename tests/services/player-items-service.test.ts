@@ -50,10 +50,9 @@ describe('player-items-service:addItem', () => {
   .spyOn(playerItemsModel, "insertOrIncrementData")
   .mockResolvedValue();
 
-  if(playerItemsData.count == null) return;
   jest
   .spyOn(playerItemsModel, "getCount")
-  .mockResolvedValue(playerItemsData.count);
+  .mockResolvedValue(playerItemsData.count!);
 
   test("playerId is Undefined", () => {
     let connection: any;
@@ -88,24 +87,19 @@ describe('player-items-service:useItem', () => {
     count: 0
   };
 
-  if(useItemData.playerId == null) return;
-  if(playerItemsData.count == null) return;
-  if(useItemData.count == null) return;
-  if(playerData.hp == null) return;
-  if(itemData.heal == null) return;
   const updatingData: Player = {
     id: useItemData.playerId,
-    hp: playerData.hp + itemData.heal * playerItemsData.count,
+    hp: playerData.hp! + itemData.heal! * playerItemsData.count!,
     mp: playerData.mp
   };
 
   if(itemData.id == null) return;
   const retval = {
     'itemId': itemData.id,
-    'count':  playerItemsData.count - useItemData.count,
+    'count':  playerItemsData.count! - useItemData.count!,
     'player': {
       'id': useItemData.playerId,
-      'hp': playerData.hp + itemData.heal * playerItemsData.count,
+      'hp': playerData.hp! + itemData.heal! * playerItemsData.count!,
       'mp': playerData.mp
     }
   }
