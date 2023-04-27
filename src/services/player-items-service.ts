@@ -19,11 +19,11 @@ const addItem = async (
 ): Promise<number> => {
 
   //プレイヤー存在チェック&ロック
-  if(addData.playerId == null) throw new Error("playerId is undefined.");
+  if(addData.playerId == null) throw new UndefinedError("playerId is undefined.");
   await selectPlayerDataByIdWithLock(addData.playerId,dbConnection);
 
   //アイテム存在チェック
-  if(addData.itemId == null) throw new Error("itemId is undefined.");
+  if(addData.itemId == null) throw new UndefinedError("itemId is undefined.");
   await selectItemDataById(addData.itemId,dbConnection);
 
   //UPDATE OR INSERT
