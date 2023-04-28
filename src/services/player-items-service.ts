@@ -5,7 +5,8 @@ import { selectAllItems, selectItemDataById } from "../models/item-model";
 import { decrementData, getCount, insertOrIncrementData,selectPlayerItemsDataById, selectPlayerItemsByPlayerId } from "../models/player-items-model";
 import { Player } from "../interfaces/player";
 import { NotEnoughError, UndefinedError } from "../interfaces/my-error";
-import { Gahca } from "../interfaces/gacha";
+import { Gacha } from "../interfaces/gacha";
+import { getRandomIntByRange } from "../helpers/random-helper";
 
 //定数宣言
 const MAX_STATUS = 200;
@@ -109,9 +110,13 @@ const useItem =async (
 }
 
 const useGacha =async (
-  gachaRequest:Gahca,
+  gachaRequest:Gacha,
   dbConnection: PoolConnection
   ):Promise<object> => {
+
+  //リクエストのデータチェック
+  if(gachaRequest.playerId == null) throw new UndefinedError("gachaRequest.playerId is undefined.")
+  if(gachaRequest.count    == null) throw new UndefinedError("gachaRequest.count is undefined.")
 
   //プレイヤーデータ取得&存在チェック&ロック
   const playerData = await selectPlayerDataByIdWithLock(gachaRequest.playerId,dbConnection);
@@ -130,11 +135,11 @@ const useGacha =async (
     let resultId:number = 0; //ガチャの結果をitemIdで格納
     let percent:number  = 0; //乱数をitemIdに変換する際に使用
 
-    //乱数生成 1~100の値をとる
-    const random = Math.floor(Math.random() * (MAX_RANDOM - MIN_RANDOM) + MIN_RANDOM);
+    //乱数生成 MIN_RANDOM~MAX_RANDOMの値をとる
+    const random = getRandomIntByRange(MIN_RANDOM, MAX_RANDOM);
 
     //乱数をガチャの結果に変換
-    while(random > percent && resultId <= itemsData.length)
+    while(random > percent && resultId < itemsData.length)
     {
       resultId++;
       const tempItemData = itemsData[resultId - 1];
