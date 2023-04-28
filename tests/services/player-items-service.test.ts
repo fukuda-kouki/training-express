@@ -19,7 +19,7 @@ const playerItemsData1: PlayerItems = {
 const playerItemsData2: PlayerItems = {
   playerId: 1,
   itemId: 2,
-  count: 1
+  count: 9
 };
 
 const playerItemsUndefinedItemId: PlayerItems = { playerId: playerItemsData1.playerId };
@@ -180,7 +180,7 @@ describe("player-items-service:useGacha", () => {
   const gachaRequestUndefinedCount: Gacha = { playerId: 1 };
   const gachaRequest:Gacha = {
     playerId: 1,
-    count: 2
+    count: 10
   }
 
   const gahcaRequestCountOver:Gacha = {
@@ -201,30 +201,30 @@ describe("player-items-service:useGacha", () => {
   const upsertPlayerItemsData2: PlayerItems = {
     playerId: 1,
     itemId: 2,
-    count: 1
+    count: 9
   }
 
   const retval = {
     'results': [
       {
-        'itemId': 1,
-        'count': 1
+        'itemId': playerItemsData1.itemId,
+        'count': playerItemsData1.count
       },
       {
-        'itemId': 2,
-        'count': 1
+        'itemId': playerItemsData2.itemId,
+        'count':  playerItemsData2.count
       }
     ],
     'player' : {
       'monay' : updatingData.money,
       'items' : [
         {
-          'itemId': 1,
-          'count': 1
+          'itemId': playerItemsData1.itemId,
+          'count': playerItemsData1.count
         },
         {
-          'itemId': 2,
-          'count': 1
+          'itemId': playerItemsData2.itemId,
+          'count': playerItemsData2.count
         }
       ]
     }
@@ -239,8 +239,15 @@ describe("player-items-service:useGacha", () => {
   .mockResolvedValue([ playerItemsData1, playerItemsData2 ]);
 
   const spyRandFunc = jest
-    .spyOn(randomHelper, "getRandomIntByRange")
+    .spyOn(randomHelper, "getRandomIntByRange");
+
+  beforeEach(() => {
+    spyUpsertFunc.mockClear();
+    spyRandFunc.mockClear();
+    spyRandFunc
+    .mockReturnValueOnce(30)
     .mockReturnValue(31);
+  })
 
   let connection: any;
   test("playerId is Undefined", () => {
@@ -267,7 +274,6 @@ describe("player-items-service:useGacha", () => {
   })
 
   test ("getRandomIntByRange called times", () => {
-    spyRandFunc.mockClear();
     useGacha(gachaRequest, connection)
     .then(() => {
       expect(randomHelper.getRandomIntByRange)
@@ -275,24 +281,25 @@ describe("player-items-service:useGacha", () => {
     })
   })
 
-  test ("1st time", () => {
-    spyUpsertFunc.mockClear();
-    spyRandFunc
-    .mockReturnValueOnce(30);
+  describe("insertOrIncrementData args", () => {
+    test ("1st time", () => {
+      useGacha(gachaRequest, connection)
+      .then(() => {
+        expect(playerItemsModel.insertOrIncrementData)
+        .toHaveBeenNthCalledWith(1,upsertPlayerItemsData1, connection);
+      })
+    })
 
-    useGacha(gachaRequest, connection)
-    .then(() => {
-      expect(playerItemsModel.insertOrIncrementData)
-      .toHaveBeenNthCalledWith(1,upsertPlayerItemsData1, connection);
-      expect(playerItemsModel.insertOrIncrementData)
-      .toHaveBeenNthCalledWith(2,upsertPlayerItemsData2, connection);
+    test ("2nd time", () => {
+      useGacha(gachaRequest, connection)
+      .then(() => {
+        expect(playerItemsModel.insertOrIncrementData)
+        .toHaveBeenNthCalledWith(2,upsertPlayerItemsData2, connection);
+      })
     })
   })
 
   test ("return value", () => {
-    spyRandFunc
-    .mockReturnValueOnce(30);
-
     expect(useGacha(gachaRequest, connection))
     .resolves.toEqual(retval);
   })
