@@ -2,11 +2,12 @@ import { PoolConnection } from "mysql2/promise";
 import { PlayerItems } from "../interfaces/player-items";
 import { selectPlayerDataByIdWithLock, updatePlayer } from "../models/player-model";
 import { selectAllItems, selectItemDataById } from "../models/item-model";
-import { decrementData, getCount, insertOrIncrementData,selectPlayerItemsDataById, selectPlayerItemsByPlayerId } from "../models/player-items-model";
+import { decrementData, getCount, insertOrIncrementData,selectPlayerItemsDataById, selectPlayerItemsByPlayerId, selectPlayerItemsWithItemDataByPlayerId } from "../models/player-items-model";
 import { Player } from "../interfaces/player";
 import { NotEnoughError, UndefinedError } from "../interfaces/my-error";
 import { Gacha } from "../interfaces/gacha";
 import { getRandomIntByRange } from "../helpers/random-helper";
+import { PlayerItemsWithItemData } from "../interfaces/player-items-with-item";
 
 //定数宣言
 const MAX_STATUS = 200;
@@ -197,4 +198,12 @@ const useGacha =async (
   return retval;
 }
 
-export{ addItem, useItem, useGacha };
+const getPlayerItemsWithItemDataByPlayerId = async(
+  RequestId:number,
+  dbConnection: PoolConnection
+  ): Promise<PlayerItemsWithItemData[]> => {
+  const Data = selectPlayerItemsWithItemDataByPlayerId(RequestId,dbConnection);
+  return Data;
+}
+
+export{ addItem, useItem, useGacha, getPlayerItemsWithItemDataByPlayerId };
