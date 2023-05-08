@@ -1,5 +1,5 @@
 import { NotEnoughError, UndefinedError } from "../../src/interfaces/my-error";
-import { addItem, useGacha, useItem } from "../../src/services/player-items-service"
+import { addItem, getPlayerItemsWithItemDataByPlayerId, useGacha, useItem } from "../../src/services/player-items-service"
 import * as playerItemsModel from "../../src/models/player-items-model"
 import * as playerModel from "../../src/models/player-model"
 import * as itemModel from "../../src/models/item-model"
@@ -8,6 +8,7 @@ import { Player } from "../../src/interfaces/player";
 import { Item } from "../../src/interfaces/item";
 import { PlayerItems } from "../../src/interfaces/player-items"
 import { Gacha } from "../../src/interfaces/gacha";
+import { PlayerItemsWithItemData } from "../../src/interfaces/player-items-with-item";
 
 const playerItemsUndefined: PlayerItems = {};
 const playerItemsData1: PlayerItems = {
@@ -302,5 +303,34 @@ describe("player-items-service:useGacha", () => {
   test ("return value", () => {
     expect(useGacha(gachaRequest, connection))
     .resolves.toEqual(retval);
+  })
+})
+
+describe("player-items-service:getPlayerItemsWithItemDataByPlayerId", () => {
+  const retData: PlayerItemsWithItemData[] = [{
+    itemId:  1,
+    name:    "1",
+    heal:    100,
+    price:   10,
+    percent: 30,
+    count:   1,
+  },
+  {
+    itemId:  2,
+    name:    "2",
+    heal:    20,
+    price:   50,
+    percent: 70,
+    count:   1,
+  }];
+  const requestId = 1;
+  test ("return value", async() => {
+    jest
+    .spyOn(playerItemsModel, "selectPlayerItemsWithItemDataByPlayerId")
+    .mockResolvedValueOnce(retData);
+
+    // 関数の実行結果と.toEqualの中身を比較する
+    let conn: any;
+    expect(await getPlayerItemsWithItemDataByPlayerId(requestId, conn)).toEqual(retData);
   })
 })

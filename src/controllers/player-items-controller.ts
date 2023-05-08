@@ -1,7 +1,7 @@
 import { Response, Request, NextFunction } from "express";
 import { PlayerItems } from "../interfaces/player-items";
 import { dbPool, transactionHelper } from "../helpers/db-helper";
-import { addItem, useGacha, useItem } from "../services/player-items-service";
+import { addItem, useGacha, useItem, getPlayerItemsWithItemDataByPlayerId } from "../services/player-items-service";
 import { MyError } from "../interfaces/my-error";
 import { Gacha } from "../interfaces/gacha";
 
@@ -87,5 +87,30 @@ export class PlayerItemsController {
       }
       next(e);
     }
+  }
+
+  async getPlayerItemDataWithItemDataByPlayerId(
+    req: Request,
+    res: Response,
+    next: NextFunction) {
+      if(req.params.id == null)
+      {
+        res.status(400).json({ message: "Invalid parameters or body." });
+        return;
+      }
+
+      const requestId = parseInt(req.params.id);
+
+      const dbConnection = await dbPool.getConnection();
+      try {
+        let retval: {} = {};
+        retval = await getPlayerItemsWithItemDataByPlayerId(requestId, dbConnection);
+        res.status(200).json(retval);
+      } catch (e) {
+        if(e instanceof MyError) {
+          res.status(400).json({message:`${e.name}:${e.message}`});
+        }
+        next(e);
+      }
   }
 }

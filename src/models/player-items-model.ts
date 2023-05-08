@@ -2,6 +2,7 @@ import { PoolConnection } from "mysql2/promise";
 import { PlayerItems } from "../interfaces/player-items";
 import { RowDataPacket } from "mysql2";
 import { NotFoundError } from "../interfaces/my-error";
+import { PlayerItemsWithItemData } from "../interfaces/player-items-with-item";
 
 //主キーからレコードを選択してデータを取得
 const selectPlayerItemsDataById = async (
@@ -87,4 +88,27 @@ const getCount =async (
     return rows[0].count;
 }
 
-export { selectPlayerItemsDataById, selectPlayerItemsByPlayerId, insertOrIncrementData, decrementData, getCount };
+const selectPlayerItemsWithItemDataByPlayerId = async(
+  playerId:number,
+  dbConnection: PoolConnection
+  ): Promise<PlayerItemsWithItemData[]> => {
+    const selectCountsql = "SELECT `item_id`, `name`, `heal`, `price`, `percent`, `count` FROM player_items, items WHERE player_items.item_id = items.id AND player_id = ?";
+    const [rows] = await dbConnection.query<RowDataPacket[]>(
+      selectCountsql,
+      playerId
+    );
+
+    const playerItemData = rows.map((row) => {
+      return {
+        itemId:  row.item_id,
+        name:    row.name,
+        heal:    row.heal,
+        price:   row.price,
+        percent: row.percent,
+        count:   row.count,
+      }
+    });
+
+    return playerItemData;
+}
+export { selectPlayerItemsDataById, selectPlayerItemsByPlayerId, insertOrIncrementData, decrementData, getCount, selectPlayerItemsWithItemDataByPlayerId };
