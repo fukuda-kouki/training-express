@@ -169,33 +169,25 @@ const useGacha =async (
   }));
 
   //戻り値の成型
-  let gachaResultObj: Array<{[index:string]: number}> = [];
-  Object.entries(gachaResult).forEach(([key, value]) => {
-    let tempObj: {[index:string]: number} = {};
-    tempObj['itemId'] = parseInt(key);
-    tempObj['count'] = value;
-    gachaResultObj.push(tempObj);
-  });
+  let retValArray: Array<{[index:string]: number | string}> = [];
 
   const playerItemsData = await selectPlayerItemsByPlayerId(gachaRequest.playerId,dbConnection);
-  let resultItemsObj: Array<{[index:string]: number}> = [];
-  Object.entries(playerItemsData).forEach(([key, value]) => {
-    if(value.itemId == null) throw new UndefinedError("value.itemId is undefined.");
-    if(value.count  == null) throw new UndefinedError("value.count is undefined.");
-    let tempObj: {[index:string]: number} = {};
-    tempObj['itemId'] = value.itemId;
-    tempObj['count'] = value.count;
-    resultItemsObj.push(tempObj);
-  });
 
-  const retval = {
-    'results': gachaResultObj,
-    'player' : {
-      'monay' : updatingData.money,
-      'items' : resultItemsObj
-    }
-  };
-  return retval;
+  for(const index in gachaResult)
+  {
+    const itemName = itemsData[parseInt(index) - 1];
+    if(itemName.name == null) throw new UndefinedError("itemName exist undefined data.");
+    const PlayerItemData = playerItemsData[parseInt(index) - 1];
+    if(PlayerItemData.count == null) throw new UndefinedError("PlayerItemData exist undefined data.");
+    let tempObj : {[index:string]: number | string} = {};
+    tempObj['itemId'] = parseInt(index);
+    tempObj['name']   = itemName.name;
+    tempObj['count']  = gachaResult[parseInt(index)];
+    tempObj['total']  = PlayerItemData.count;
+    retValArray.push(tempObj);
+  }
+
+  return retValArray;
 }
 
 const getPlayerItemsWithItemDataByPlayerId = async(
